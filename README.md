@@ -13,6 +13,8 @@ To load the library directly from your GitHub repository:
 ```lua
 -- Load the live library from your GitHub source
 local ShadowX = loadstring(game:HttpGet("https://raw.githubusercontent.com/mikmikuser/ShadowX-Ui-Library/main/ShadowXLib.lua"))()
+```
+
 ---
 
 ## 🚀 Getting Started

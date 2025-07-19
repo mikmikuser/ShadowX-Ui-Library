@@ -1,6 +1,6 @@
 # 🌌 ShadowX UI Library
 
-ShadowX is a glowing, Fluent-inspired Roblox UI library designed for both **Mobile** and **PC**. Built by **MBR DEV**, this library provides a responsive, clean, and powerful interface for your scripts — with buttons, toggles, sliders, inputs, keybinds, and more.
+ShadowX is a glowing, Fluent-inspired Roblox UI library designed for both **Mobile** and **PC**. Created by **MBR DEV**, this library provides a clean and powerful interface with buttons, toggles, sliders, dropdowns, inputs, keybinds, and more.
 
 > ✨ Modern UI • 📱 Mobile Friendly • ⚙️ Developer Ready
 
@@ -8,14 +8,11 @@ ShadowX is a glowing, Fluent-inspired Roblox UI library designed for both **Mobi
 
 ## 📦 Installation
 
-To use ShadowX in your game, insert the following in your script:
+To load the library directly from your GitHub repository:
 
 ```lua
-local ShadowX = loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR-USERNAME/ShadowX/main/ShadowXLib.lua"))()
-```
-
-> Replace `YOUR-USERNAME` with your GitHub username.
-
+-- Load the live library from your GitHub source
+local ShadowX = loadstring(game:HttpGet("https://raw.githubusercontent.com/mikmikuser/ShadowX-Ui-Library/main/ShadowXLib.lua"))()
 ---
 
 ## 🚀 Getting Started

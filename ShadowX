@@ -1,221 +1,85 @@
--- ShadowX Fluent-Style UI Library (Mobile Friendly & Full Features)
+-- ShadowX UI Lib (Ringta-Style Template)
 local ShadowX = {}
 
-function ShadowX.NewWindow(options)
-    local title = options.Title or "ShadowX"
-    local width, height = 320, 400 -- Mobile-friendly dimensions
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
-    local ui = Instance.new("ScreenGui", game.CoreGui)
-    ui.Name = "ShadowX_Lib"
-    ui.ResetOnSpawn = false
+-- Main GUI
+local gui = Instance.new("ScreenGui", PlayerGui)
+gui.Name = "ShadowXUI"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
 
-    local main = Instance.new("Frame", ui)
-    main.Size = UDim2.new(0, width, 0, height)
-    main.Position = UDim2.new(0.5, -width/2, 0.5, -height/2)
-    main.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
-    main.BorderSizePixel = 0
-    main.ClipsDescendants = true
-    Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
-    Instance.new("UIStroke", main).Color = Color3.fromRGB(0, 200, 255)
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 600, 0, 370)
+main.Position = UDim2.new(0.5, -300, 0.5, -185)
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+main.BorderSizePixel = 0
 
-    local sidebar = Instance.new("Frame", main)
-    sidebar.Size = UDim2.new(0, 90, 1, 0)
-    sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 55)
-    Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 6)
-    local sidebarLayout = Instance.new("UIListLayout", sidebar)
-    sidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    sidebarLayout.Padding = UDim.new(0, 6)
+local uiCorner = Instance.new("UICorner", main)
+uiCorner.CornerRadius = UDim.new(0, 12)
 
-    local titleLabel = Instance.new("TextLabel", sidebar)
-    titleLabel.Text = title
-    titleLabel.Size = UDim2.new(1, 0, 0, 30)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 14
+-- Tab Bar
+local tabBar = Instance.new("Frame", main)
+tabBar.Size = UDim2.new(1, 0, 0, 42)
+tabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+tabBar.BorderSizePixel = 0
+Instance.new("UICorner", tabBar).CornerRadius = UDim.new(0, 8)
 
-    local tabPages = Instance.new("Folder", main)
-    tabPages.Name = "Pages"
+local layout = Instance.new("UIListLayout", tabBar)
+layout.FillDirection = Enum.FillDirection.Horizontal
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 6)
 
-    local tabs, sections = {}, {}
-    local window = {}
+-- Content Container
+local content = Instance.new("Frame", main)
+content.Position = UDim2.new(0, 0, 0, 42)
+content.Size = UDim2.new(1, 0, 1, -42)
+content.BackgroundTransparency = 1
 
-    function window:AddTab(tabName, icon)
-        local btn = Instance.new("TextButton", sidebar)
-        btn.Text = " " .. tabName
-        btn.Size = UDim2.new(1, -10, 0, 28)
-        btn.TextXAlignment = Enum.TextXAlignment.Left
-        btn.BackgroundColor3 = Color3.fromRGB(35, 35, 70)
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 13
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+-- Internal storage
+local tabs = {}
 
-        local page = Instance.new("ScrollingFrame", tabPages)
-        page.Size = UDim2.new(1, -100, 1, -20)
-        page.Position = UDim2.new(0, 95, 0, 10)
-        page.Visible = (#tabs == 0)
-        page.ScrollBarThickness = 4
-        page.BackgroundTransparency = 1
-        page.AutomaticCanvasSize = Enum.AutomaticCanvasSize.Y
-        Instance.new("UIListLayout", page).Padding = UDim.new(0, 6)
+function ShadowX:CreateTab(name)
+	local tabButton = Instance.new("TextButton", tabBar)
+	tabButton.Text = name
+	tabButton.Size = UDim2.new(0, 120, 1, 0)
+	tabButton.BackgroundTransparency = 1
+	tabButton.TextColor3 = Color3.new(1, 1, 1)
+	tabButton.Font = Enum.Font.GothamMedium
+	tabButton.TextSize = 14
 
-        btn.MouseButton1Click:Connect(function()
-            for _, t in pairs(tabs) do t.Page.Visible = false end
-            page.Visible = true
-        end)
+	local tabPage = Instance.new("Frame", content)
+	tabPage.Size = UDim2.new(1, 0, 1, 0)
+	tabPage.BackgroundTransparency = 1
+	tabPage.Visible = false
+	tabPage.Name = name
 
-        table.insert(tabs, {Button = btn, Page = page})
-        return page
-    end
+	tabs[name] = tabPage
 
-    function window:AddSection(tab, title)
-        local sec = Instance.new("Frame", tab)
-        sec.Size = UDim2.new(1, -10, 0, 24)
-        sec.BackgroundTransparency = 1
-        local lbl = Instance.new("TextLabel", sec)
-        lbl.Size = UDim2.new(1, 0, 1, 0)
-        lbl.Text = title
-        lbl.TextColor3 = Color3.fromRGB(150, 150, 255)
-        lbl.Font = Enum.Font.GothamSemibold
-        lbl.TextSize = 13
-        lbl.BackgroundTransparency = 1
-        return sec
-    end
+	tabButton.MouseButton1Click:Connect(function()
+		for _, tab in pairs(tabs) do
+			tab.Visible = false
+		end
+		tabPage.Visible = true
+		tabPage.BackgroundTransparency = 1
+		tabPage.Position = UDim2.new(0, 0, 0, 20)
+		TweenService:Create(tabPage, TweenInfo.new(0.3), {
+			Position = UDim2.new(0, 0, 0, 0),
+			BackgroundTransparency = 0,
+		}):Play()
+	end)
 
-    function window:AddButton(section, label, callback)
-        local btn = Instance.new("TextButton", section)
-        btn.Size = UDim2.new(1, 0, 0, 30)
-        btn.Text = label
-        btn.BackgroundColor3 = Color3.fromRGB(30, 60, 90)
-        btn.TextColor3 = Color3.new(1,1,1)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 13
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-        btn.MouseButton1Click:Connect(callback)
-        return btn
-    end
+	-- Show first tab by default
+	if #content:GetChildren() == 1 then
+		tabPage.Visible = true
+	end
 
-    function window:AddToggle(section, label, default, callback)
-        local toggle = Instance.new("TextButton", section)
-        toggle.Size = UDim2.new(1, 0, 0, 30)
-        toggle.Text = label .. (default and " [ON]" or " [OFF]")
-        toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 90)
-        toggle.TextColor3 = Color3.new(1,1,1)
-        toggle.Font = Enum.Font.Gotham
-        toggle.TextSize = 13
-        Instance.new("UICorner", toggle).CornerRadius = UDim.new(0, 6)
-
-        local state = default
-        toggle.MouseButton1Click:Connect(function()
-            state = not state
-            toggle.Text = label .. (state and " [ON]" or " [OFF]")
-            callback(state)
-        end)
-        return toggle
-    end
-
-    function window:AddTextbox(section, placeholder, callback)
-        local box = Instance.new("TextBox", section)
-        box.Size = UDim2.new(1, 0, 0, 30)
-        box.PlaceholderText = placeholder
-        box.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-        box.TextColor3 = Color3.new(1,1,1)
-        box.Font = Enum.Font.Gotham
-        box.TextSize = 13
-        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
-
-        box.FocusLost:Connect(function()
-            callback(box.Text)
-        end)
-        return box
-    end
-
-    function window:AddSlider(section, label, min, max, default, callback)
-        local holder = Instance.new("Frame", section)
-        holder.Size = UDim2.new(1, 0, 0, 40)
-        holder.BackgroundTransparency = 1
-
-        local lbl = Instance.new("TextLabel", holder)
-        lbl.Text = label .. ": " .. default
-        lbl.Size = UDim2.new(1, 0, 0, 20)
-        lbl.BackgroundTransparency = 1
-        lbl.TextColor3 = Color3.fromRGB(200, 200, 255)
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 12
-
-        local slider = Instance.new("TextButton", holder)
-        slider.Size = UDim2.new(1, 0, 0, 16)
-        slider.Position = UDim2.new(0, 0, 0, 22)
-        slider.BackgroundColor3 = Color3.fromRGB(40, 100, 255)
-        Instance.new("UICorner", slider).CornerRadius = UDim.new(0, 6)
-
-        slider.MouseButton1Click:Connect(function()
-            local value = math.random(min, max) -- Simulated value for demo
-            lbl.Text = label .. ": " .. tostring(value)
-            callback(value)
-        end)
-    end
-
-    function window:AddDropdown(section, label, options, callback)
-        local drop = Instance.new("TextButton", section)
-        drop.Size = UDim2.new(1, 0, 0, 30)
-        drop.Text = label .. " ▼"
-        drop.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
-        drop.TextColor3 = Color3.new(1,1,1)
-        drop.Font = Enum.Font.Gotham
-        drop.TextSize = 13
-        Instance.new("UICorner", drop).CornerRadius = UDim.new(0, 6)
-
-        drop.MouseButton1Click:Connect(function()
-            for _, opt in ipairs(options) do
-                callback(opt)
-                break -- Simulate pick
-            end
-        end)
-        return drop
-    end
-
-    function window:AddLabel(section, text)
-        local lbl = Instance.new("TextLabel", section)
-        lbl.Size = UDim2.new(1, 0, 0, 20)
-        lbl.Text = text
-        lbl.BackgroundTransparency = 1
-        lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 13
-        return lbl
-    end
-
-    function window:AddParagraph(section, title, body)
-        local lbl = Instance.new("TextLabel", section)
-        lbl.Size = UDim2.new(1, 0, 0, 40)
-        lbl.Text = title .. "\n" .. body
-        lbl.TextWrapped = true
-        lbl.TextColor3 = Color3.fromRGB(220, 220, 255)
-        lbl.BackgroundTransparency = 1
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 13
-        return lbl
-    end
-
-    function window:Notify(text)
-        local note = Instance.new("TextLabel", ui)
-        note.Text = text
-        note.Size = UDim2.new(0, 260, 0, 38)
-        note.Position = UDim2.new(0.5, -130, 1, -55)
-        note.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-        note.TextColor3 = Color3.fromRGB(255, 255, 255)
-        note.Font = Enum.Font.GothamBold
-        note.TextSize = 13
-        note.AnchorPoint = Vector2.new(0.5, 1)
-        Instance.new("UICorner", note).CornerRadius = UDim.new(0, 8)
-        task.delay(3, function()
-            note:Destroy()
-        end)
-    end
-
-    return window
+	return tabPage
 end
 
 return ShadowX
